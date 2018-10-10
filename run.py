@@ -1,6 +1,6 @@
 from sudoku import Sudoku
 
-x = Sudoku(size=7)
+x = Sudoku(size=71)
 
 """x.box_sequence = [
     [0,0,0,1,1],
