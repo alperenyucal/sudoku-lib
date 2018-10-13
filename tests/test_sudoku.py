@@ -1,5 +1,5 @@
 import unittest
-from sudoku import Sudoku
+from sudoku_lib import Sudoku
 
 
 class TestBactracking(unittest.TestCase):
