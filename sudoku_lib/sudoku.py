@@ -51,18 +51,18 @@ class Sudoku:
     [6,6,6,7,7,7,8,8,8]]
     }
 
-    def __init__(self, type='N', size=9, encoded_string=None):
+    def __init__(self, type='N', size=9, encoded={}):
 
         self.type = type
         self.size = size
-        self.encoded_string = encoded_string
+        self.encoded = encoded
         self.sudoku = []
         self.finalized = []
         self.box_sequence = self.box_sequence_defaults[size]
         self.regional = []
         self.characters = []
 
-        if self.encoded_string != None:
+        if len(self.encoded) != 0:
             self.decode()
 
     def is_in_row(self, sudoku, num, row):
@@ -147,10 +147,11 @@ class Sudoku:
 
     def decode(self):
         
-        parsed_list = self.encoded_string.split('-')
-        
-        type = parsed_list[0]
-        size = int(parsed_list[1])
+        type = self.encoded['type']
+        size = self.encoded['size']
+        sudoku_string = self.encoded['sudoku'] 
+        sequence_string =self.encoded['sequence']
+        finalized_string = self.encoded['finalized']
 
         sudoku = [[None for i in range(size)] for j in range(size)]
         finalized =[[None for i in range(size)] for j in range(size)]
@@ -158,60 +159,61 @@ class Sudoku:
         c = 0
         for i in range(1,size+1):
             for j in range(size):
-                k = int(parsed_list[2][c])
+                k = int(sudoku_string[c])
                 c+=1
                 sudoku[j][k]=i
 
         box_sequence = self.box_sequence_defaults[size]
         if type != 'N':
-            sq = parsed_list[3]
+            sq = sequence_string[3]
             for i in range(0,len(sq)-1,3):
                 box_sequence[int(sq[i+1])][int(sq[i+2])] = int(sq[i])
 
-        a = 3 if type == 'N' else 4
-
-        for i in range(0,len(parsed_list[a])-1,2):
-            k = int(parsed_list[a][i])
-            j = int(parsed_list[a][i+1])
+        for i in range(0,len(finalized_string)-1,2):
+            k = int(finalized_string[i])
+            j = int(finalized_string[i+1])
             finalized[k][j] = sudoku[k][j]
 
-        self.type=type
-        self.size=size
-        self.sudoku=sudoku
-        self.finalized=finalized
-        self.box_sequence=box_sequence
+        self.type = type
+        self.size = size
+        self.sudoku = sudoku
+        self.finalized = finalized
+        self.box_sequence = box_sequence
+
         self.row_to_region(sudoku)
 
     def encode(self):
 
         size = self.size
         box_sequence = self.box_sequence
-
-        encoded_string = self.type + '-' + str(size) + '-'
         
+        sudoku_string = ""
         for i in range(1, size+1):
             for j in range(size):
                 for k in range(size):
                     if self.sudoku[j][k] == i:
-                        encoded_string += str(k)
+                        sudoku_string += str(k)
         
-        if self.type != 'N':
-            
-            encoded_string += "-"
-
-            for i in range(size):
-                for j in range(size):
-                    if box_sequence[i][j] != self.box_sequence_defaults[size][i][j]:
-                        encoded_string += str(box_sequence[i][j]) + str(i) + str(j)   
         
-        encoded_string += "-"
+        sequence_string = ""
+        for i in range(size):
+            for j in range(size):
+                if box_sequence[i][j] != self.box_sequence_defaults[size][i][j]:
+                    sequence_string += str(box_sequence[i][j]) + str(i) + str(j)   
+        
 
+        finalized_string = ""
         for i in range(size):
             for j in range(size):
                 if self.finalized[i][j] != None:
-                    encoded_string += str(i) + str(j)
+                    finalized_string += str(i) + str(j)
 
-        self.encoded_string = encoded_string
+
+        self.encoded['type'] = self.type
+        self.encoded['size'] = self.size
+        self.encoded['sudoku'] = sudoku_string
+        self.encoded['sequence'] = sequence_string
+        self.encoded['finalized'] = finalized_string
 
     def generate(self):
     
