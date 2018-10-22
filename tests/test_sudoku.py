@@ -1,6 +1,8 @@
 import unittest
-from sudoku_lib import Sudoku
+import sudoku_lib
 
+from sudoku_lib import Sudoku
+"use > python -m unittest tests.test_sudoku"
 
 class TestBactracking(unittest.TestCase):
     
