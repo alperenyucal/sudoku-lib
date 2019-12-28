@@ -79,11 +79,12 @@ class Sudoku:
         return True if num in regional[reg] else False
 
     def is_valid(self, sudoku, num, row, col):
-        is_in_row = self.is_in_row(sudoku, num, row)
-        is_in_column = self.is_in_column(sudoku, num, col)
-        is_in_region = self.is_in_region(sudoku, num, self.box_sequence[row][col])
-        is_cell_full = self.is_cell_full(sudoku, row, col)
-        return True if not is_in_row and not is_in_column and not is_in_region and not is_cell_full else False
+        is_valid_move = not self.is_in_row(sudoku, num, row) and \
+                        not self.is_in_column(sudoku, num, col) and \
+                        not self.is_in_region(sudoku, num, self.box_sequence[row][col]) and \
+                        not self.is_cell_full(sudoku, row, col)
+        
+        return True if is_valid_move else False
 
     def is_cell_full(self, sudoku, row, col):
         return True if sudoku[row][col] is not None else False
