@@ -1,73 +1,70 @@
 import random
 import copy
 
+
 class Sudoku:
 
     box_sequence_defaults = {
 
-    4:[[0,0,1,1],
-    [0,0,1,1],
-    [2,2,3,3],
-    [2,2,3,3]],
+        4: [[0, 0, 1, 1],
+            [0, 0, 1, 1],
+            [2, 2, 3, 3],
+            [2, 2, 3, 3]],
 
-    5:[[0,0,0,1,1],
-    [0,0,3,1,1],
-    [2,3,3,3,1],
-    [2,2,3,4,4],
-    [2,2,4,4,4]],
+        5: [[0, 0, 0, 1, 1],
+            [0, 0, 3, 1, 1],
+            [2, 3, 3, 3, 1],
+            [2, 2, 3, 4, 4],
+            [2, 2, 4, 4, 4]],
 
-    6:[[0,0,0,1,1,1],
-    [0,0,0,1,1,1],
-    [2,2,2,3,3,3],
-    [2,2,2,3,3,3],
-    [4,4,4,5,5,5],
-    [4,4,4,5,5,5]],
+        6: [[0, 0, 0, 1, 1, 1],
+            [0, 0, 0, 1, 1, 1],
+            [2, 2, 2, 3, 3, 3],
+            [2, 2, 2, 3, 3, 3],
+            [4, 4, 4, 5, 5, 5],
+            [4, 4, 4, 5, 5, 5]],
 
-    7:[[0,0,0,1,2,2,2],
-    [0,0,1,1,1,2,2],
-    [0,0,1,1,1,2,2],
-    [3,4,4,4,4,5,5],
-    [3,3,4,4,4,5,5],
-    [3,3,6,6,6,5,5],
-    [3,3,6,6,6,6,5]],
+        7: [[0, 0, 0, 1, 2, 2, 2],
+            [0, 0, 1, 1, 1, 2, 2],
+            [0, 0, 1, 1, 1, 2, 2],
+            [3, 4, 4, 4, 4, 5, 5],
+            [3, 3, 4, 4, 4, 5, 5],
+            [3, 3, 6, 6, 6, 5, 5],
+            [3, 3, 6, 6, 6, 6, 5]],
 
-    8:[[0,0,0,0,1,1,1,1],
-    [0,0,0,0,1,1,1,1],
-    [2,2,2,2,3,3,3,3],
-    [2,2,2,2,3,3,3,3],
-    [4,4,4,4,5,5,5,5],
-    [4,4,4,4,5,5,5,5],
-    [6,6,6,6,7,7,7,7],
-    [6,6,6,6,7,7,7,7]],
+        8: [[0, 0, 0, 0, 1, 1, 1, 1],
+            [0, 0, 0, 0, 1, 1, 1, 1],
+            [2, 2, 2, 2, 3, 3, 3, 3],
+            [2, 2, 2, 2, 3, 3, 3, 3],
+            [4, 4, 4, 4, 5, 5, 5, 5],
+            [4, 4, 4, 4, 5, 5, 5, 5],
+            [6, 6, 6, 6, 7, 7, 7, 7],
+            [6, 6, 6, 6, 7, 7, 7, 7]],
 
-    9:[[0,0,0,1,1,1,2,2,2],
-    [0,0,0,1,1,1,2,2,2],
-    [0,0,0,1,1,1,2,2,2],
-    [3,3,3,4,4,4,5,5,5],
-    [3,3,3,4,4,4,5,5,5],
-    [3,3,3,4,4,4,5,5,5],
-    [6,6,6,7,7,7,8,8,8],
-    [6,6,6,7,7,7,8,8,8],
-    [6,6,6,7,7,7,8,8,8]]
+        9: [[0, 0, 0, 1, 1, 1, 2, 2, 2],
+            [0, 0, 0, 1, 1, 1, 2, 2, 2],
+            [0, 0, 0, 1, 1, 1, 2, 2, 2],
+            [3, 3, 3, 4, 4, 4, 5, 5, 5],
+            [3, 3, 3, 4, 4, 4, 5, 5, 5],
+            [3, 3, 3, 4, 4, 4, 5, 5, 5],
+            [6, 6, 6, 7, 7, 7, 8, 8, 8],
+            [6, 6, 6, 7, 7, 7, 8, 8, 8],
+            [6, 6, 6, 7, 7, 7, 8, 8, 8]]
     }
 
-    def __init__(self, type='N', size=9, encoded={}):
+    def __init__(self, type='N', size=9):
 
         self.type = type
         self.size = size
-        self.encoded = encoded
         self.sudoku = []
         self.finalized = []
         self.box_sequence = self.box_sequence_defaults[size]
         self.regional = []
         self.characters = []
 
-        if len(self.encoded) != 0:
-            self.decode()
-
     def is_in_row(self, sudoku, num, row):
         return True if num in sudoku[row] else False
-            
+
     def is_in_column(self, sudoku, num, col):
         for row in range(len(sudoku)):
             if num == sudoku[row][col]:
@@ -80,10 +77,10 @@ class Sudoku:
 
     def is_valid(self, sudoku, num, row, col):
         is_valid_move = not self.is_in_row(sudoku, num, row) and \
-                        not self.is_in_column(sudoku, num, col) and \
-                        not self.is_in_region(sudoku, num, self.box_sequence[row][col]) and \
-                        not self.is_cell_full(sudoku, row, col)
-        
+            not self.is_in_column(sudoku, num, col) and \
+            not self.is_in_region(sudoku, num, self.box_sequence[row][col]) and \
+            not self.is_cell_full(sudoku, row, col)
+
         return True if is_valid_move else False
 
     def is_cell_full(self, sudoku, row, col):
@@ -97,34 +94,37 @@ class Sudoku:
         for i in range(size):
             row = ""
             for j in range(size):
-                
-                if j==0:
+
+                if j == 0:
                     sdkstr += '|'
 
                 n = sudoku[i][j]
-                
+
                 if n == None:
                     n = ' '
-                
+
                 sdkstr += f" {str(n)} "
-                
-                if j!=size-1:
+
+                if j != size-1:
                     sdkstr += '|' if box_sq[i][j] != box_sq[i][j+1] else ' '
                 else:
                     sdkstr += '|'
-                
-                if j<size-1 and j==0:
+
+                if j < size-1 and j == 0:
                     row += '|'
-                
-                row += "---" if i<size-1 and box_sq[i][j] !=box_sq[i+1][j] else "   "
-              
-                if j<size-1:
-                    row += '|' if box_sq[i][j] != box_sq[i][j+1] and row[len(row)-1] != '-' else ' '
+
+                row += "---" if i < size - \
+                    1 and box_sq[i][j] != box_sq[i+1][j] else "   "
+
+                if j < size-1:
+                    row += '|' if box_sq[i][j] != box_sq[i][j +
+                                                            1] and row[len(row)-1] != '-' else ' '
                 else:
                     row += '|'
-            
-            sdkstr += '\n' + row + '\n' if i != size-1 else '\n'+ f" {(size*4-1)*'-'}"
-        
+
+            sdkstr += '\n' + row + '\n' if i != size - \
+                1 else '\n' + f" {(size*4-1)*'-'}"
+
         print(sdkstr)
         return sdkstr
 
@@ -147,7 +147,7 @@ class Sudoku:
         return regional
 
     def generate(self):
-    
+
         size = self.size
         attempt = 0
         num = 1
@@ -156,18 +156,19 @@ class Sudoku:
 
         while num <= size:
             for row in range(size):
-                
-                valid_cells = [col for col in range(size) if self.is_valid(self.sudoku, num, row, col)]
-                
+
+                valid_cells = [col for col in range(
+                    size) if self.is_valid(self.sudoku, num, row, col)]
+
                 if len(valid_cells) == 0:
                     self.sudoku = copy.deepcopy(temp[num-1])
                     break
-                    
-                col = random.choice(valid_cells)  
+
+                col = random.choice(valid_cells)
                 self.sudoku[row][col] = num
-                        
+
             attempt += 1
-                
+
             if attempt == size*3:
                 num -= 1
                 self.sudoku = copy.deepcopy(temp[num-1])
@@ -178,17 +179,17 @@ class Sudoku:
             if self.count_number(num) == size:
                 temp.append(copy.deepcopy(self.sudoku))
                 num += 1
-                
+
     def finalize(self):
-        
+
         s = self.size
         finalized = copy.deepcopy(self.sudoku)
-        num = random.randint(s*(s-4),s*(s-2))
+        num = random.randint(s*(s-4), s*(s-2))
         count = 0
-        
+
         while True:
-            row = random.randint(0,s-1)
-            col = random.randint(0,s-1)
+            row = random.randint(0, s-1)
+            col = random.randint(0, s-1)
             if self.is_cell_full(self.sudoku, row, col):
                 finalized[row][col] = None
                 count += 1
@@ -202,11 +203,12 @@ class Sudoku:
         size = self.size
         sudoku = copy.deepcopy(self.finalized)
 
-        empty_cells = [[i,j,0] for i in range(size) for j in range(size) if not self.is_cell_full(sudoku,i,j)]
+        empty_cells = [[i, j, 0] for i in range(size) for j in range(
+            size) if not self.is_cell_full(sudoku, i, j)]
 
         flag = 0
         while True:
-            
+
             if len(empty_cells) == 0:
                 break
 
@@ -222,19 +224,19 @@ class Sudoku:
                 empty_cells[flag][2] = num
 
                 if self.is_valid(sudoku, num, row, col):
-                    
+
                     sudoku[row][col] = num
-                    flag+=1
+                    flag += 1
             else:
                 empty_cells[flag][2] = 0
-                flag-=1
-                
+                flag -= 1
+
             if flag == len(empty_cells):
                 break
-            
-            if flag==0 and num==size+1:
+
+            if flag == 0 and num == size+1:
                 return False
 
         self.finalized = copy.deepcopy(sudoku)
-            
+
         return True
