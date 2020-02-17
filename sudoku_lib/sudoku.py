@@ -4,7 +4,7 @@ import copy
 
 class Sudoku:
 
-    box_sequence_defaults = {
+    region_sequence_defaults = {
 
         4: [[0, 0, 1, 1],
             [0, 0, 1, 1],
@@ -58,12 +58,12 @@ class Sudoku:
         self.size = size
         self.sudoku = []
         self.finalized = []
-        self.box_sequence = self.box_sequence_defaults[size]
+        self.region_sequence = self.region_sequence_defaults[size]
         self.regional = []
         self.characters = []
 
     def is_in_row(self, sudoku, num, row):
-        return True if num in sudoku[row] else False
+        return num in sudoku[row]
 
     def is_in_column(self, sudoku, num, col):
         for row in range(len(sudoku)):
@@ -73,23 +73,23 @@ class Sudoku:
 
     def is_in_region(self, sudoku, num, reg):
         regional = self.row_to_region(sudoku)
-        return True if num in regional[reg] else False
+        return num in regional[reg]
 
     def is_valid(self, sudoku, num, row, col):
         is_valid_move = not self.is_in_row(sudoku, num, row) and \
             not self.is_in_column(sudoku, num, col) and \
-            not self.is_in_region(sudoku, num, self.box_sequence[row][col]) and \
+            not self.is_in_region(sudoku, num, self.region_sequence[row][col]) and \
             not self.is_cell_full(sudoku, row, col)
 
-        return True if is_valid_move else False
+        return is_valid_move 
 
     def is_cell_full(self, sudoku, row, col):
-        return True if sudoku[row][col] is not None else False
+        return sudoku[row][col] is not None
 
     def print_sudoku(self, sudoku):
         size = self.size
         sdkstr = f" {(size*4-1)*'-'}" + '\n'
-        box_sq = self.box_sequence
+        reg_sq = self.region_sequence
 
         for i in range(size):
             row = ""
@@ -106,7 +106,7 @@ class Sudoku:
                 sdkstr += f" {str(n)} "
 
                 if j != size-1:
-                    sdkstr += '|' if box_sq[i][j] != box_sq[i][j+1] else ' '
+                    sdkstr += '|' if reg_sq[i][j] != reg_sq[i][j+1] else ' '
                 else:
                     sdkstr += '|'
 
@@ -114,10 +114,10 @@ class Sudoku:
                     row += '|'
 
                 row += "---" if i < size - \
-                    1 and box_sq[i][j] != box_sq[i+1][j] else "   "
+                    1 and reg_sq[i][j] != reg_sq[i+1][j] else "   "
 
                 if j < size-1:
-                    row += '|' if box_sq[i][j] != box_sq[i][j +
+                    row += '|' if reg_sq[i][j] != reg_sq[i][j +
                                                             1] and row[len(row)-1] != '-' else ' '
                 else:
                     row += '|'
@@ -142,11 +142,11 @@ class Sudoku:
 
         for i in range(self.size):
             for j in range(self.size):
-                regional[self.box_sequence[i][j]].append(sudoku[i][j])
+                regional[self.region_sequence[i][j]].append(sudoku[i][j])
 
         return regional
 
-    def generate(self):
+    def generate_full(self):
 
         size = self.size
         attempt = 0
@@ -174,7 +174,7 @@ class Sudoku:
                 self.sudoku = copy.deepcopy(temp[num-1])
                 temp.pop()
             elif attempt == size*5:
-                self.generate()
+                self.generate_full()
 
             if self.count_number(num) == size:
                 temp.append(copy.deepcopy(self.sudoku))
