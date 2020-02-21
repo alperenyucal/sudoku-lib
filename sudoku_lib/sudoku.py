@@ -81,7 +81,7 @@ class Sudoku:
             not self.is_in_region(sudoku, num, self.region_sequence[row][col]) and \
             not self.is_cell_full(sudoku, row, col)
 
-        return is_valid_move 
+        return is_valid_move
 
     def is_cell_full(self, sudoku, row, col):
         return sudoku[row][col] is not None
@@ -128,11 +128,11 @@ class Sudoku:
         print(sdkstr)
         return sdkstr
 
-    def count_number(self, num):
+    def count_number(self, sudoku, num):
         count = 0
         for i in range(self.size):
             for j in range(self.size):
-                if self.sudoku_complete[i][j] == num:
+                if sudoku[i][j] == num:
                     count += 1
         return count
 
@@ -151,7 +151,8 @@ class Sudoku:
         size = self.size
         attempt = 0
         num = 1
-        self.sudoku_complete = [[None for i in range(size)] for j in range(size)]
+        self.sudoku_complete = [
+            [None for i in range(size)] for j in range(size)]
         temp = [copy.deepcopy(self.sudoku_complete)]
 
         while num <= size:
@@ -176,7 +177,7 @@ class Sudoku:
             elif attempt == size*5:
                 self.generate_full()
 
-            if self.count_number(num) == size:
+            if self.count_number(self.sudoku_complete, num) == size:
                 temp.append(copy.deepcopy(self.sudoku_complete))
                 num += 1
 
@@ -198,7 +199,7 @@ class Sudoku:
 
         self.sudoku = sudoku
 
-    def backtrack(self):
+    def backtrack_deprecated(self):
 
         size = self.size
         sudoku = copy.deepcopy(self.sudoku)
@@ -237,6 +238,55 @@ class Sudoku:
             if flag == 0 and num == size+1:
                 return False
 
-        self.sudoku = copy.deepcopy(sudoku)
-
         return True
+
+    def backtrack(self):
+
+        size = self.size
+        sudoku = copy.deepcopy(self.sudoku)
+
+        empty_cells = [[i, j, 0] for i in range(size) for j in range(
+            size) if not self.is_cell_full(sudoku, i, j)]
+
+        if len(empty_cells) == 0:
+            return -1
+
+        solution_count = 0
+
+        position = 0
+        first_loop = False
+        while True:
+
+            row = empty_cells[position][0]
+            col = empty_cells[position][1]
+            num = empty_cells[position][2]
+            num += 1
+
+            if sudoku[row][col] != None:
+                sudoku[row][col] = None
+
+            if num <= size:
+                empty_cells[position][2] = num
+
+                if self.is_valid(sudoku, num, row, col):
+                    position += 1
+                    sudoku[row][col] = num
+
+            else:
+                empty_cells[position][2] = 0
+                position -= 1
+
+            if position == len(empty_cells):
+                solution_count += 1
+                self.print_sudoku(sudoku)
+
+                position -= 1
+                empty_cells[position][2] = 0
+                position -= 1
+
+            if empty_cells[0][2] == 0 and not first_loop:
+                if solution_count == 1:
+                    self.sudoku = sudoku
+                break
+
+        return solution_count
