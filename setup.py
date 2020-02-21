@@ -9,6 +9,8 @@ setuptools.setup(
     author="Alperen Yucal",
     author_email="author@example.com",
     description="Everything about sudoku.",
+    keywords='sudoku sudokulib',
+    license='MIT',
     long_description=long_description,
     long_description_content_type="text/markdown",
     packages=setuptools.find_packages(),
