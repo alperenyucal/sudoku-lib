@@ -59,8 +59,6 @@ class Sudoku:
         self.sudoku_complete = []
         self.sudoku = []
         self.region_sequence = self.region_sequence_defaults[size]
-        self.regional = []
-        self.characters = []
 
     def is_in_row(self, sudoku, num, row):
         return num in sudoku[row]
@@ -198,52 +196,16 @@ class Sudoku:
                 break
 
         self.sudoku = sudoku
-
-    def backtrack_deprecated(self):
-
-        size = self.size
-        sudoku = copy.deepcopy(self.sudoku)
-
-        empty_cells = [[i, j, 0] for i in range(size) for j in range(
-            size) if not self.is_cell_full(sudoku, i, j)]
-
-        flag = 0
-        while True:
-
-            if len(empty_cells) == 0:
-                break
-
-            row = empty_cells[flag][0]
-            col = empty_cells[flag][1]
-            num = empty_cells[flag][2]
-            num += 1
-
-            if sudoku[row][col] != None:
-                sudoku[row][col] = None
-
-            if num <= size:
-                empty_cells[flag][2] = num
-
-                if self.is_valid(sudoku, num, row, col):
-
-                    sudoku[row][col] = num
-                    flag += 1
-            else:
-                empty_cells[flag][2] = 0
-                flag -= 1
-
-            if flag == len(empty_cells):
-                break
-
-            if flag == 0 and num == size+1:
-                return False
-
-        return True
+        if self.backtrack()[0] == 1:
+            return
+        else:
+            self.finalize()
 
     def backtrack(self):
 
         size = self.size
         sudoku = copy.deepcopy(self.sudoku)
+        full_sudoku = None
 
         empty_cells = [[i, j, 0] for i in range(size) for j in range(
             size) if not self.is_cell_full(sudoku, i, j)]
@@ -278,7 +240,7 @@ class Sudoku:
 
             if position == len(empty_cells):
                 solution_count += 1
-                self.print_sudoku(sudoku)
+                full_sudoku = copy.deepcopy(sudoku)
 
                 position -= 1
                 empty_cells[position][2] = 0
@@ -289,4 +251,4 @@ class Sudoku:
                     self.sudoku = sudoku
                 break
 
-        return solution_count
+        return solution_count, full_sudoku
