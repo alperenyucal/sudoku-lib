@@ -13,14 +13,14 @@ class TestBactracking(unittest.TestCase):
             [4,2,1,3],
             [2,4,3,1],
             [3,1,4,2]]
-        s.finalized = [
+        s.sudoku = [
             [1,3,2,4],
             [4,2,1,3],
             [2,4,3,1],
             [3,1,4,2]]
 
-        s.backtrack()
-        self.assertEqual(sudoku, s.finalized)
+        s.sudoku = s.backtrack()[1]
+        self.assertEqual(sudoku, s.sudoku)
         
     def test_one_cell_empty(self):
 
@@ -30,14 +30,15 @@ class TestBactracking(unittest.TestCase):
             [4,2,1,3],
             [2,4,3,1],
             [3,1,4,2]]
-        s.finalized = [
+        s.sudoku = [
             [1,3,2,4],
             [4,2,None,3],
             [2,4,3,1],
             [3,1,4,2]]
         
-        s.backtrack()
-        self.assertEqual(sudoku, s.finalized)
+
+        s.sudoku = s.backtrack()[1]
+        self.assertEqual(sudoku, s.sudoku)
         
 
 if __name__ == '__main__':

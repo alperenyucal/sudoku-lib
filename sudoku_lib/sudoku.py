@@ -52,9 +52,8 @@ class Sudoku:
             [6, 6, 6, 7, 7, 7, 8, 8, 8]]
     }
 
-    def __init__(self, type='N', size=9):
+    def __init__(self, size=9):
 
-        self.type = type
         self.size = size
         self.sudoku_complete = []
         self.sudoku = []
@@ -211,7 +210,7 @@ class Sudoku:
             size) if not self.is_cell_full(sudoku, i, j)]
 
         if len(empty_cells) == 0:
-            return -1
+            return 1, sudoku
 
         solution_count = 0
 
@@ -252,3 +251,10 @@ class Sudoku:
                 break
 
         return solution_count, full_sudoku
+
+
+class Solver(Sudoku):
+
+    def __init__(self, size):
+        super().__init__(size)
+        self.notes = [[[] for i in range(size)] for j in range(size)]
